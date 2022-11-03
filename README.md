@@ -17,7 +17,7 @@ The app exposes a *my-computation-timer* metric that measures the execution time
 
 To check if metrics are exposed visit:
 
-    echo https://$(oc get route -n openshift-console console -o jsonpath='{.spec.host})
+    echo https://$(oc get route -n openshift-console console -o jsonpath='{.spec.host})/monitoring/query-browser?query0=rate%28my_computation_timer_seconds_sum%5B5m%5D%29%2Frate%28my_computation_timer_seconds_count%5B5m%5D%29
 
 And to see an example of average execution time in the last 5 minutes, you can try the query:
 
