@@ -21,18 +21,12 @@ import io.micrometer.core.instrument.Timer;
 public class MetricsResource {
 
     @Inject
-    MeterRegistry registry;
-    @Inject
     TestFunction testFunction;
 
     @GET
     @Path("/run")
     public String execute() throws InterruptedException {
         testFunction.loadAction();
-        // Random duration = new Random();
-        // Integer millis = duration.nextInt(5000);
-        // Timer timer = Timer.builder("my-awesome-timer").tag("name", "sample").publishPercentiles(0.95).publishPercentileHistogram(true).register(registry);
-        // timer.record(Duration.ofMillis(millis));
         return "OK";
     }
 

@@ -13,4 +13,4 @@ spec:
     scheme: http
   selector:
     matchLabels:
-      app: metrics-quarkus-git
+      app: metrics-quarkus
