@@ -2,59 +2,24 @@
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+To easily get the app up & running:
 
-## Running the application in dev mode
+    oc new-project metrics-quarkus
+    oc new-app --name metrics-quarkus --as-deployment-config=false java:openjdk-17-ubi8~https://github.com/kubealex/metrics-quarkus.git
+    oc expose svc metrics-quarkus
+    oc apply -f https://raw.githubusercontent.com/kubealex/metrics-quarkus/master/ocp/servicemonitor.yaml -f https://raw.githubusercontent.com/kubealex/metrics-quarkus/master/ocp/cluster-monitoring-config-map.yaml
 
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
-```
+After the build ends, you can test the endpoint via:
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+    for i in {1..20}; do curl -k https://$(oc get route -n test-building metrics-quarkus -o jsonpath='{.spec.host}')/run; done
 
-## Packaging and running the application
+The app exposes a *my-computation-timer* metric that measures the execution time of a simulated calculation in a range from 0-5000ms.
 
-The application can be packaged using:
-```shell script
-./mvnw package
-```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+To check if metrics are exposed visit:
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+    echo https://$(oc get route -n openshift-console console -o jsonpath='{.spec.host})
 
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
-```
+And to see an example of average execution time in the last 5 minutes, you can try the query:
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+    rate(my_computation_timer_seconds_sum[5m])/rate(my_computation_timer_seconds_count[5m])
 
-## Creating a native executable
-
-You can create a native executable using: 
-```shell script
-./mvnw package -Pnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/metrics-tester-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
-
-## Related Guides
-
-- Micrometer Registry Prometheus ([guide](https://quarkus.io/guides/micrometer)): Enable Prometheus support for Micrometer
-
-## Provided Code
-
-### RESTEasy Reactive
-
-Easily start your Reactive RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
